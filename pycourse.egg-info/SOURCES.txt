@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+pycourse/__init__.py
+pycourse/categories.py
+pycourse/courses.py
+pycourse.egg-info/PKG-INFO
+pycourse.egg-info/SOURCES.txt
+pycourse.egg-info/dependency_links.txt
+pycourse.egg-info/top_level.txt

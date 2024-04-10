@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: pycourse
+Version: 0.0.1
+Summary: A python package for maanging and analysing course grades
+Author-email: Jeremy Webb <webbjj@yorku.ca>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+A python package for maanging and analysing course grades
