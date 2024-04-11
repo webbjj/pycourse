@@ -45,7 +45,7 @@ class Accomodation(object):
 				self.ndrops.update({category : ndrop})
 			elif len(self.ndrops) >=1 and category not in self.ndrops.keys():
 				self.ndrops.update({category : ndrop})				
-			elif ndrop is not None and cateogry in self.ndrops.keys():
+			elif ndrop is not None and category in self.ndrops.keys():
 				self.ndrops[category]+=ndrop
 
 			

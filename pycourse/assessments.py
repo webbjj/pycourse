@@ -2,7 +2,7 @@ import numpy as np
 
 class Assessment(object):
 
-    def __init__(self,category,num,grades,optional):
+    def __init__(self,category,num,grades,optional=False):
         self.category=category
         self.num=num
         self.grades=np.array(grades)

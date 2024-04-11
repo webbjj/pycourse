@@ -114,6 +114,8 @@ class Course(object):
 
     def _update_categories(self,category):
 
+        print('UP DEBUG: ',category,self.cat)
+
         if category not in self.cat:
             self.cat=np.append(self.cat,category)
             self.ncat=np.append(self.ncat,1)
@@ -130,6 +132,20 @@ class Course(object):
         ----------
         firstname : str
             strudents first name (default : None)
+        lastname : str
+            strudents lastname (default : None)
+        i_d : int
+            strudents i_d (default : None)
+        email : str
+            strudents email address (default : None)
+        category : str
+            category that accomodation is to be applied (default: None)
+        num : int
+            assessment number within category that accomodation is to be appled (default: None)
+        ndrops : int
+            number of lowest assessments within category to be dropped for accomodated student
+        nmisses : int
+            number of missed assessments within category to be dropped for accomodated student
         """
 
         student_arg = self._student_search(firstname,lastname,i_d,email)
@@ -237,6 +253,8 @@ class Course(object):
 
                 if accomodation is not None:
 
+                    print('DEBUG0':,cat,num,accomodation.categories,accomodation.nums)
+
                     if cat in accomodation.categories and num in accomodation.nums:
                         keepers[j]=False
                     elif cat in accomodation.nmisses.keys():
@@ -247,6 +265,7 @@ class Course(object):
                 if self.assessments[j].optional and grades[j]==0 and keepers[j]:
                     keepers[j]=False
                 elif not self.assessments[j].optional and grades[j]==0 and npass[cat] < (scheme.nmisses[cat]+nmiss_extra) and keepers[j]:
+                    print('DEBUG: ',npass[cat],scheme.nmisses[cat],nmiss_extra)
                     npass[cat]+=1
                     keepers[j]=False
 

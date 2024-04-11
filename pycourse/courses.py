@@ -130,6 +130,20 @@ class Course(object):
         ----------
         firstname : str
             strudents first name (default : None)
+        lastname : str
+            strudents lastname (default : None)
+        i_d : int
+            strudents i_d (default : None)
+        email : str
+            strudents email address (default : None)
+        category : str
+            category that accomodation is to be applied (default: None)
+        num : int
+            assessment number within category that accomodation is to be appled (default: None)
+        ndrops : int
+            number of lowest assessments within category to be dropped for accomodated student
+        nmisses : int
+            number of missed assessments within category to be dropped for accomodated student
         """
 
         student_arg = self._student_search(firstname,lastname,i_d,email)
