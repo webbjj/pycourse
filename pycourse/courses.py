@@ -36,6 +36,9 @@ class Course(object):
         self.categories=np.array([])
         self.cat=np.array([]) 
         self.ncat=np.array([])
+        self.due_dates=np.array([])
+        self.post_dates=np.array([])
+
 
         self.nums=np.array([])
         self.accomodations=np.array([])
@@ -89,7 +92,7 @@ class Course(object):
 
         return add_return
 
-    def add_assessment(self,category,num,grades,optional=False):
+    def add_assessment(self,category,num,grades,due_data=None,post_date=None,optional=False):
         """Add an assessment to the course
 
         Parameters
@@ -100,6 +103,10 @@ class Course(object):
             Assessment number within the category
         grades : float
             Array of student grades
+        due_date : str
+            Assessment due date (default: None)
+        post_date : str
+            Assessment grade posting data (default: None)
         optional : bool
             Is assessment optional or not? (default: False)
         """
