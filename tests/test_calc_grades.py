@@ -24,6 +24,12 @@ def course_check(course,nc,na,weights0,nmiss=0,tol=0.001):
 
 		assert np.sum(np.fabs(course.weights0-weights0)) <=tol
 		
+		#Check weighted grades
+
+		assert np.sum(np.fabs(course.weights0-weights0)) <=tol
+		assert np.sum(np.sum(course.final_grade_fracs,axis=1)-course.final_grades) <=tol
+
+
 		#Check final grades are as expected
 		assert np.sum(np.fabs(course.final_grades - expected_grades)) <= tol
 
@@ -226,7 +232,7 @@ def test_internal_reweighting(tol=0.001):
 						elif i==1:
 							course.add_assessment(str(float(i)),j,np.zeros(nstudents))
 
-				course.calc_grades(scheme,return_weighting=True)
+				course.calc_grades(scheme)
 
 				#Check weights0 array
 				weights0=np.array([])
@@ -278,7 +284,7 @@ def test_external_reweighting(tol=0.001):
 						elif i==1:
 							course.add_assessment(str(float(i)),j,np.zeros(nstudents))
 
-				course.calc_grades(scheme,return_weighting=True)
+				course.calc_grades(scheme)
 
 				#Check weights0 array
 				weights0=np.array([])

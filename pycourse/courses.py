@@ -114,7 +114,10 @@ class Course(object):
 
     def _update_categories(self,category):
 
-        if category not in self.cat:
+        if len(self.cat) ==0:
+            self.cat=np.append(self.cat,category)
+            self.ncat=np.append(self.ncat,1)
+        elif category not in self.cat:
             self.cat=np.append(self.cat,category)
             self.ncat=np.append(self.ncat,1)
         elif category in self.cat:
@@ -153,25 +156,23 @@ class Course(object):
         else:
             print('Accomodation not added')
 
-    def calc_grades(self,scheme,return_weighting=False):
+    def calc_grades(self,scheme):
         """Calculate final category grades and final grades
 
         Parameters
         ----------
         scheme : class
             Grading scheme for the course
-        return_weighting : bool
-            If True, self.weights will be created with the weight of each assessment (default: False)
         """
 
         #setup default weights
         self.weights0=np.zeros(len(self.assessments))
         self.final_grades=np.zeros(len(self.firstnames))
         self.final_cat_grades=np.zeros([len(self.firstnames),len(self.ncats)])
-        self.keepers=np.ones([len(self.firstnames),len(self.assessments)])
+        self.final_grade_fracs=np.zeros([len(self.firstnames),len(self.assessments)])
 
-        if return_weighting:
-            self.weights=np.zeros([len(self.firstnames),len(self.assessments)])
+        self.keepers=np.ones([len(self.firstnames),len(self.assessments)])
+        self.weights=np.zeros([len(self.firstnames),len(self.assessments)])
 
         for i in range(0,len(self.assessments)):
             cat=self.assessments[i].category
@@ -179,12 +180,11 @@ class Course(object):
 
         #Account for optional assessments, allowed misses, and reweighting schemes
         for i in range(0,len(self.firstnames)):
-            if return_weighting:
-                self.final_grades[i],self.final_cat_grades[i],self.keepers[i],self.weights[i]=self._calc_student_grade(self.grades[i],scheme,weights0=self.weights0,accomodation=self.accomodations[i],return_weighting=return_weighting)
-            else:
-                self.final_grades[i],self.final_cat_grades[i],self.keepers[i]=self._calc_student_grade(self.grades[i],scheme,weights0=self.weights0,accomodation=self.accomodations[i],return_weighting=return_weighting)
+            self.final_grades[i],self.final_cat_grades[i],self.keepers[i],self.weights[i]=self._calc_student_grade(self.grades[i],scheme,weights0=self.weights0,accomodation=self.accomodations[i])
+            self.final_grade_fracs[i]=self.grades[i]*self.weights[i]/100.0
 
-    def optimize_grades(self,schemes,return_weighting=False):
+
+    def optimize_grades(self,schemes):
         """Calculate final category grades and final grades using the scheme that maximizes grade
 
         Parameters
@@ -197,17 +197,20 @@ class Course(object):
         self.weights0=np.zeros([len(self.firstnames),len(self.assessments)])
         self.final_grades=np.zeros(len(self.firstnames))
         self.final_cat_grades=np.zeros([len(self.firstnames),len(self.ncats)])
+        self.final_grade_fracs=np.zeros([len(self.firstnames),len(self.assessments)])
         self.keepers=np.ones([len(self.firstnames),len(self.assessments)])
 
-        if return_weighting:
-            self.weights=np.zeros([len(self.firstnames),len(self.assessments)])
-            weights=np.zeros([len(self.firstnames),len(self.assessments)])
+
+        self.weights=np.zeros([len(self.firstnames),len(self.assessments)])
+        weights=np.zeros([len(self.firstnames),len(self.assessments)])
 
         for scheme in schemes:
 
             weights0=np.zeros(len(self.assessments))
             final_grades=np.zeros(len(self.firstnames))
             final_cat_grades=np.zeros([len(self.firstnames),len(self.ncats)])
+            final_grade_fracs=np.zeros([len(self.firstnames),len(self.assessments)])
+
             keepers=np.ones([len(self.firstnames),len(self.assessments)])
 
             for i in range(0,len(self.assessments)):
@@ -216,21 +219,19 @@ class Course(object):
 
             #Account for optional assessments, allowed misses, and reweighting schemes
             for i in range(0,len(self.firstnames)):
-                if return_weighting:
-                    final_grades[i],final_cat_grades[i],keepers[i],weights[i]=self._calc_student_grade(self.grades[i],scheme,weights0=weights0,accomodation=self.accomodations[i],return_weighting=return_weighting)
-                else:
-                    final_grades[i],final_cat_grades[i],keepers[i]=self._calc_student_grade(self.grades[i],scheme,weights0=weights0,accomodation=self.accomodations[i],return_weighting=return_weighting)
+                final_grades[i],final_cat_grades[i],keepers[i],weights[i]=self._calc_student_grade(self.grades[i],scheme,weights0=weights0,accomodation=self.accomodations[i])
+                final_grade_fracs[i]=self.grades[i]*weights[i]/100.0
 
             optgrade=final_grades>self.final_grades
 
             self.final_grades[optgrade]=final_grades[optgrade]
             self.final_cat_grades[optgrade]=final_cat_grades[optgrade]
+            self.final_grade_fracs[optgrade]=final_grade_fracs[optgrade]
             self.keepers[optgrade]=keepers[optgrade]
-            if return_weighting:
-                self.weights[optgrade]=weights[optgrade]
+            self.weights[optgrade]=weights[optgrade]
 
 
-    def _calc_student_grade(self,grades,scheme,weights0=None,accomodation=None,return_weighting=False):
+    def _calc_student_grade(self,grades,scheme,weights0=None,accomodation=None):
 
             npass=dict(zip(self.ncats.keys(),np.zeros(len(self.ncats))))
             keepers=np.ones(len(grades),dtype=bool)
@@ -251,10 +252,13 @@ class Course(object):
 
                 if accomodation is not None:
 
-                    if cat in accomodation.categories and num in accomodation.nums:
-                        keepers[j]=False
-                    elif cat in accomodation.nmisses.keys():
-                        nmiss_extra=accomodation.nmisses[cat]
+                    if len(accomodation.categories)>0:
+                        if cat in accomodation.categories and num in accomodation.nums:
+                            keepers[j]=False
+                        elif cat in accomodation.nmisses.keys():
+                            nmiss_extra=accomodation.nmisses[cat]
+                        else:
+                            nmiss_extra=0
                     else:
                         nmiss_extra=0
 
@@ -328,10 +332,8 @@ class Course(object):
             if diff > 0.001:
                 print('GRADE SUM ERROR',i,final_cat_grade,np.sum(final_cat_grade),final_grade)
 
-            if return_weighting:
-                return final_grade,final_cat_grade,keepers,weights
-            else:
-                return final_grade,final_cat_grade,keepers
+            return final_grade,final_cat_grade,keepers,weights
+
 
     def _student_search(self,firstname=None,lastname=None,i_d=None,email=None):
 
