@@ -1,4 +1,4 @@
-A python package for manging and analysing course grades
+A python package for managing and analysing course assessments
 
 This package is currently in development.
 

@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = [
   { name="Jeremy Webb", email="webbjj@yorku.ca" },
 ]
-description = "A python package for manging and analysing course grades"
+description = "A python package for managing and analysing course assessments"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
