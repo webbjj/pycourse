@@ -23,7 +23,7 @@ def course_check(course,nc,na,weights0,nmiss=0,tol=0.001):
 		#Check final grades are as expected
 		assert np.sum(np.fabs(course.final_grades - expected_grades)) <= tol
 
-def test_accomodations_by_miss(tol=0.001):
+def test_optimize_scheme(tol=0.001):
 	ncats=[1,2,3,4]
 	nassess=[2,3,4,5]
 

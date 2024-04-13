@@ -92,7 +92,7 @@ class Course(object):
 
         return add_return
 
-    def add_assessment(self,category,num,grades,due_data=None,post_date=None,optional=False):
+    def add_assessment(self,category,num,grades,due_date=None,post_date=None,optional=False):
         """Add an assessment to the course
 
         Parameters
@@ -110,7 +110,7 @@ class Course(object):
         optional : bool
             Is assessment optional or not? (default: False)
         """
-        self.assessments=np.append(self.assessments,Assessment(category,num,grades,optional))
+        self.assessments=np.append(self.assessments,Assessment(category,num,grades,due_date,post_date,optional))
         self.categories=np.append(self.categories,category)
         self.nums=np.append(self.nums,num)
 
@@ -181,9 +181,15 @@ class Course(object):
         self.keepers=np.ones([len(self.firstnames),len(self.assessments)])
         self.weights=np.zeros([len(self.firstnames),len(self.assessments)])
 
+        catcall=dict(zip(self.categories,np.zeros(len(self.categories))))
+
         for i in range(0,len(self.assessments)):
             cat=self.assessments[i].category
-            self.weights0[i]=scheme.weights[cat]/self.ncats[cat]
+            if not scheme.subscheme[cat]:
+                self.weights0[i]=scheme.weights[cat]/self.ncats[cat]
+            else:
+                self.weights0[i]=scheme.subweights[cat][int(catcall[cat])]
+                catcall[cat]+=1
 
         #Account for optional assessments, allowed misses, and reweighting schemes
         for i in range(0,len(self.firstnames)):
@@ -220,9 +226,16 @@ class Course(object):
 
             keepers=np.ones([len(self.firstnames),len(self.assessments)])
 
+
+            catcall=dict(zip(self.categories,np.zeros(len(self.categories))))
+
             for i in range(0,len(self.assessments)):
                 cat=self.assessments[i].category
-                weights0[i]=scheme.weights[cat]/self.ncats[cat]
+                if not scheme.subscheme[cat]:
+                    weights0[i]=scheme.weights[cat]/self.ncats[cat]
+                else:
+                    weights0[i]=scheme.subweights[cat][int(catcall[cat])]
+                    catcall[cat]+=1
 
             #Account for optional assessments, allowed misses, and reweighting schemes
             for i in range(0,len(self.firstnames)):
@@ -247,9 +260,29 @@ class Course(object):
             if weights0 is None:
                 weights0=np.zeros(len(self.assessments))
 
+                catcall=dict(zip(self.categories,np.zeros(len(self.categories))))
+
                 for i in range(0,len(self.assessments)):
                     cat=self.assessments[i].category
-                    weights0[i]=scheme.weights[cat]/self.ncats[cat]
+                    if not scheme.subscheme[cat]:
+                        weights0[i]=scheme.weights[cat]/self.ncats[cat]
+                    else:
+                        weights0[i]=scheme.subweights[cat][int(catcall[cat])]
+                        catcall[cat]+=1
+
+            #Check to see of weights should be optimized:
+            for i in range(0,len(scheme.categories)):
+                cat=scheme.categories[i]
+                if scheme.subscheme[cat] and scheme.optimize[cat]:
+                    subweights=scheme.subweights[cat]
+                    weightsortargs=np.flip(np.argsort(scheme.subweights[cat]))
+                    catmatcharg=np.argwhere((self.categories==cat)*keepers).flatten()
+                    maxsortargs=np.flip(np.argsort(grades))
+                    nmatch=0
+                    for maxarg in maxsortargs:
+                        if maxarg in catmatcharg:
+                            weights0[maxarg]=subweights[weightsortargs[nmatch]]
+                            nmatch+=1
 
             #Set allowed misses, drops and optional assignments to non-keepers
             for j in range(0,len(self.assessments)):

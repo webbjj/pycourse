@@ -55,3 +55,29 @@ class GradingScheme(object):
 		else:
 			self.reweighting=dict(zip(self.categories,reweighting))
 
+		self.subscheme=dict(zip(self.categories,np.zeros(len(self.categories),dtype=bool)))
+		self.subweights=dict(zip(self.categories,np.zeros(len(self.categories))))
+		self.optimize=dict(zip(self.categories,np.zeros(len(self.categories),dtype=bool)))
+
+	def add_subscheme(self,category,weights,optimize=False):
+		"""Add a subscheme to a category if assessments are not equally weighted within
+			- note 
+		Parameters
+		----------
+		category : str
+		    Array of category names
+		weights : int or float
+		    Array of category weights
+	    optimize : bool
+	    	If True, highest weight will be given to highest grade
+	    	If False, order of weights must match order assessments are loaded
+	    	(Default: False)
+		"""
+
+		self.subscheme[category]=True
+		self.subweights[category]=weights
+		self.optimize[category]=optimize
+
+
+
+
