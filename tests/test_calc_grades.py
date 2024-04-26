@@ -17,7 +17,7 @@ def course_check(course,nc,na,weights0,nmiss=0,tol=0.001):
 		assert abs(np.sum(course.keepers)-nc*na*nstudents+nmiss*nc*nstudents) <= tol
 		
 		#Check weights0 array
-		assert len(course.weights0) == int(nc*na)
+		assert len(course.weights0[0]) == int(nc*na)
 
 		print(course.weights0)
 		print(weights0)
