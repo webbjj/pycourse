@@ -377,8 +377,6 @@ class Course(object):
                 else:
                     nmiss_extra=0
 
-                print('NMISS EXTRA: ',nmiss_extra)
-
                 if self.assessments[j].optional and grades[j]==0 and keepers[j]:
                     keepers[j]=False
                 elif not self.assessments[j].optional and grades[j]==0 and npass[cat] < (scheme.nmisses[cat]+nmiss_extra) and keepers[j]:
